@@ -1,0 +1,13 @@
+year,king,attack,win,lose,winPer
+298,Euron Greyjoy,0,0,0,null
+299,Euron Greyjoy,5,5,0,100%
+300,Euron Greyjoy,2,2,0,100%
+298,Joffrey Baratheon,4,4,0,100%
+299,Joffrey Baratheon,4,3,1,75%
+300,Joffrey Baratheon,5,5,0,100%
+298,Robb Stark,3,2,1,66.60%
+299,Robb Stark,7,6,1,85.70%
+300,Robb Stark,0,0,0,null
+298,Stannis Baratheon,0,0,0,null
+299,Stannis Baratheon,2,1,1,50%
+300,Stannis Baratheon,3,1,2,33.30%

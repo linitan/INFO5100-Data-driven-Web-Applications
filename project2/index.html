@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" type="text/css" href="styles/style.css">
+  <link rel="stylesheet" type="text/css"
+        href="https://fonts.googleapis.com/css?family=EB+Garamond">
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="http://d3js.org/topojson.v2.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+</head>
+
+<body>
+  <!-- Banner -->
+    <!-- <section id="banner">
+
+    </section> -->
+    <section id="banner2">
+
+    </section>
+
+    <section id="banner3">
+<script src="sneaky.js"></script>
+    </section>
+
+    <section id="banner4">
+      <br>
+      <!-- <h3>Conclusion</h3> -->
+      <br><br>
+    <p> Battle cause ruins</p>
+
+      <p> Attacker has more deaths</p>
+
+      <p> Winter will pass</p>
+
+      <p> Peace will come to Westeros in the end </p>
+
+        <p>         --To Game of Thrones</p><br><br><br>
+    </section>
+<script>
+var height = 600;
+var width = 1000;
+var padding = 50;
+var svg = d3.select("#banner").append("svg")
+.attr("height", height).attr("width", width);
+var svg = d3.select("#banner2").append("svg")
+.attr("id", "linePlot")
+.attr("height", height).attr("width", width);
+
+svg.append("text")
+.attr("id", "battleDetail")
+.attr("x", 500)
+.attr("y", 298)
+.attr("fill", "white")
+.style("font-size", "22pt");
+svg.append("text")
+.attr("id", "Year")
+.attr("x", 473)
+.attr("y", 319)
+.attr("fill", "white")
+.style("font-size", "13pt");
+svg.append("text")
+.attr("id", "Type")
+.attr("x", 673)
+.attr("y", 319)
+.attr("fill", "white")
+.style("font-size", "13pt");
+svg.append("text")
+.attr("id", "Attacker")
+.attr("x", 380)
+.attr("y", 340)
+.attr("fill", "white")
+.style("font-size", "15pt");
+svg.append("svg:image")
+.attr("id", "AttackerImg")
+.attr('x',420)
+.attr('y',350)
+.attr('width', 100)
+.attr('height', 150);
+svg.append("text")
+.attr("id", "Defender")
+.attr("x", 620)
+.attr("y", 340)
+.attr("fill", "white")
+.style("font-size", "15pt");
+svg.append("svg:image")
+.attr("id", "DefenderImg")
+.attr('x',670)
+.attr('y',350)
+.attr('width', 100)
+.attr('height', 150);
+svg.append("rect")
+.attr("id", "winner")
+.attr('stroke', '#2acca1')
+.attr('stroke-width', '5')
+.attr('fill', 'none');
+svg.append("text")
+.text("Winner")
+.attr("id", "winText")
+.attr("fill", "#2acca1")
+.style("font-size", "24px");
+// Define variables outside the scope of the callback function.
+var battleData;
+var winData;
+
+// This function will be applied to all rows. Select three columns, change names, and convert strings to numbers.
+function parsesLine (line) {
+	return {
+    x: Number(line["x"]),
+    y: Number(line["y"]),
+		Battle: line["name"],
+		Region: line["region"],
+    Attacker: line["attacker_king"],
+    Defender: line["defender_king"],
+    Result: line["attacker_outcome"],
+    SizeAttacker: Number(line["attacker_size"]),
+    SizeDefender: Number(line["defender_size"]),
+    Year: line["year"],
+    Type: line["battle_type"],
+	};
+}
+d3.csv("battles.csv", parsesLine, function (error, data) {
+	battleData = data;
+  var battleWhereX = function(battle){
+    if (battle.Region == "Beyond the Wall"){
+      return 160;
+    }
+    else if (battle.Region == "The Crownlands") {
+      //region from (200,305) to (208,355)
+      return Math.random()*(208-200)+200;
+    }
+    else if (battle.Region == "The North") {
+      //region from (100,70) to (200,170)
+      return Math.random()*(200-100)+100;
+    }
+    else if (battle.Region == "The Reach") {
+      //region from (70,370) to (150,390)
+      return Math.random()*(150-70)+70;
+    }
+    else if (battle.Region == "The Riverlands") {
+      //region from (110,220) to (160,310)
+      return Math.random()*(160-110)+110;
+    }
+    else if (battle.Region == "The Stormlands") {
+      //region from (185,370) to (225,420)
+      return Math.random()*(225-185)+185;
+    }
+    else{
+      //region from (70,270) to (100,350)
+      return Math.random()*(100-70)+70;
+    }
+  }
+
+  var battleWhereY = function(battle){
+    if (battle.Region == "Beyond the Wall"){
+      return 6;
+    }
+    else if (battle.Region == "The Crownlands") {
+      //region from (200,305) to (208,355)
+      return Math.random()*(355-305)+305;
+    }
+    else if (battle.Region == "The North") {
+      //region from (100,70) to (200,170)
+      return Math.random()*(170-70)+70;
+    }
+    else if (battle.Region == "The Reach") {
+      //region from (70,370) to (150,390)
+      return Math.random()*(390-370)+370;
+    }
+    else if (battle.Region == "The Riverlands") {
+      //region from (110,220) to (160,310)
+      return Math.random()*(310-220)+220;
+    }
+    else if (battle.Region == "The Stormlands") {
+      //region from (185,370) to (225,420)
+      return Math.random()*(420-370)+370;
+    }
+    else{
+      //region from (70,270) to (100,350)
+      return Math.random()*(350-270)+270;
+    }
+  }
+
+  var sizeExtent = d3.extent(battleData,
+    function (d) { return d.SizeDefender+d.SizeAttacker; });
+  console.log(sizeExtent);
+  var sizeScale = d3.scaleLinear()
+  .domain(sizeExtent)
+  .range([20, 55]);
+
+  var sizeRange = [20,35,50];
+  var sizeQuantizeScale = d3.scaleQuantize().domain(sizeExtent).range(sizeRange);
+
+  battleData.forEach(function (battle) {
+    svg.append("svg:image")
+    // .attr('x',battleWhereX(battle))
+    // .attr('y',battleWhereY(battle))
+    .attr('x',+battle.x)
+    .attr('y',+battle.y)
+    .attr('width', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+    .attr('height', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+   .attr("xlink:href","images/p2.png")
+   .on("mouseover", function () {
+      // console.log("x:"+this.x.animVal.value);
+      // console.log("y:"+this.y.animVal.value);
+			svg.select("#battleDetail").text(battle.Battle);
+      svg.select("#Year").text("Year: " + battle.Year);
+      svg.select("#Type").text("Type: " + battle.Type);
+      svg.select("#Attacker").text("Attacker: " + battle.Attacker);
+      svg.select("#Defender").text("Defender: " + battle.Defender);
+      // svg.select("#AttackerImg").attr("xlink:href","images/"+battle.Attacker+".jpg");
+      // svg.select("#DefenderImg").attr("xlink:href","images/"+battle.Defender+".jpg");
+      svg.select("#AttackerImg").attr("xlink:href",function(){
+        if (battle.Result == "win"){return "images/"+battle.Attacker+".jpg";}
+        else{return "images/"+battle.Attacker+"Lose.jpg";}
+      });
+      svg.select("#DefenderImg").attr("xlink:href",function(){
+        if (battle.Result == "win"){return "images/"+battle.Defender+"Lose.jpg";}
+        else{return "images/"+battle.Defender+".jpg";}
+      });
+      svg.select("#winner").attr("x",function(){
+        if (battle.Result == "win"){return 420;}
+        else{return 670;}
+      }).attr('y',350).attr('width', 100)
+      .attr('height', 150);
+      svg.select("#winText").attr("x",function(){
+        if (battle.Result == "win"){return 440;}
+        else{return 690;}
+      }).attr("y", 520);
+      svg.append("svg:image")
+      .attr('x', 560)
+      .attr('y',400)
+      .attr('width', 60)
+      .attr('height', 60)
+      .attr("xlink:href","images/vs.png");
+		});
+  });
+
+  svg.append("svg:image")
+  .attr('x', 90)
+  .attr('y',560)
+  .attr('width', 20)
+  .attr('height', 20)
+  .attr("xlink:href","images/p2.png");
+
+  svg.append("svg:image")
+  .attr('x', 140)
+  .attr('y',550)
+  .attr('width', 35)
+  .attr('height', 35)
+  .attr("xlink:href","images/p2.png");
+
+  svg.append("svg:image")
+  .attr('x', 200)
+  .attr('y',540)
+  .attr('width', 50)
+  .attr('height', 50)
+  // .attr("fill", "red")
+  .attr("xlink:href","images/p2.png");
+
+
+  svg.append("text")
+  .text("Size(People):")
+  .attr("x", 0)
+  .attr("y", 570)
+  // .attr("fill", "red")
+  .style("font-size", "10pt");
+
+  svg.append("text")
+  .text("<30000")
+  .attr("x", 80)
+  .attr("y", 600)
+  .style("font-size", "10pt");
+
+  svg.append("text")
+  .text(">30000")
+  .attr("x", 140)
+  .attr("y", 600)
+  .style("font-size", "10pt");
+
+  svg.append("text")
+  .text(">100000")
+  .attr("x", 200)
+  .attr("y", 600)
+  .style("font-size", "10pt");
+
+  // This function will be applied to all rows. Select three columns, change names, and convert strings to numbers.
+  function parsesLine2 (line) {
+  	return {
+      King: line["king"],
+      AttackAmount: Number(line["attack"]),
+      WinAmount: Number(line["win"]),
+      LoseAmount: Number(line["lose"]),
+      Year: Number(line["year"]),
+  	};
+  }
+
+d3.csv("winPercent.csv", parsesLine2, function (error, data) {
+  winData = data;
+  svg.append("line")
+  .style("stroke","Black")
+  .style("stroke-width",3)
+  .attr("x1", 300)
+  .attr("y1", 160)
+  .attr("x2", 750)
+  .attr("y2", 160);
+  svg.append("line")
+  .style("stroke","Black")
+  .style("stroke-width",3)
+  .attr("x1", 300)
+  .attr("y1", 160)
+  .attr("x2", 300)
+  .attr("y2", 60);
+  var yScale = d3.scaleLinear().domain([0,7])
+        .range([160, 60]);
+  svg.append("text")
+      .attr("class", "label")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 305).attr("x", -50)
+      .attr("dy", "1em")
+      .style("text-anchor", "end")
+      .text("Attack Battle Amount")
+      .attr("font-family", "sans-serif")
+      .attr("font-size", "10px")
+      .attr("fill", "Black");
+  svg.append("text").attr("class", "label")
+          .attr("x", width-245).attr("y", 153)
+          .text("Year")
+        .attr("font-family", "sans-serif")
+          .attr("font-size", "10px")
+        .style("text-anchor", "end")
+        .attr("fill", "Black");
+  //draw X anxis
+  svg.append("line")
+  .style("stroke","Black")
+  .style("stroke-width",3)
+  .attr("x1", 412.5)
+  .attr("y1", 160)
+  .attr("x2", 412.5)
+  .attr("y2", 155);
+  svg.append("line")
+  .style("stroke","Black")
+  .style("stroke-width",3)
+  .attr("x1", 525)
+  .attr("y1", 160)
+  .attr("x2", 525)
+  .attr("y2", 155);
+  svg.append("line")
+  .style("stroke","Black")
+  .style("stroke-width",3)
+  .attr("x1", 637.5)
+  .attr("y1", 160)
+  .attr("x2", 637.5)
+  .attr("y2", 155);
+  svg.append("text")
+  .text("298")
+  .attr("x",400)
+  .attr("y",174)
+  .attr("fill", "Black")
+  .style("font-size", "12pt");
+  svg.append("text")
+  .text("299")
+  .attr("x",512.5)
+  .attr("y",174)
+  .attr("fill", "Black")
+  .style("font-size", "12pt");
+  svg.append("text")
+  .text("300")
+  .attr("x",625)
+  .attr("y",174)
+  .attr("fill", "Black")
+  .style("font-size", "12pt");
+
+  data = [1,2,3,4,5,6,7];
+
+  data.forEach(function (battle) {
+    svg.append("line")
+    .style("stroke","Black")
+    .style("stroke-width",2)
+    .attr("x1", 300)
+    .attr("y1", yScale(battle))
+    .attr("x2", 305)
+    .attr("y2", yScale(battle));
+    svg.append("text")
+    .text(battle)
+    .attr("x", 288)
+    .attr("y", yScale(battle)+3)
+    .attr("fill", "Black")
+    .style("font-size", "10pt");
+  });
+
+//pie1
+  var j298 = [
+          { label: 'win', count: 4 },
+          { label: 'lose', count: 0 }
+        ];
+   var pieWidth = 15;
+   var pieHeight = 15;
+   var radius = Math.min(pieHeight, pieWidth) / 2;
+   var color1 = d3.scaleOrdinal()
+  .range(['#ff0000', '#ffb3b3']);
+        var arc = d3.arc()
+          .innerRadius(0)
+          .outerRadius(radius);
+        var pie = d3.pie()
+          .value(function(d) { return d.count; })
+          .sort(null);
+        var path = svg.append('g').selectAll('path')
+          .data(pie(j298))
+          .enter()
+          .append('path')
+          .attr('transform', 'translate(412.5,'+yScale(4)+')')
+          .attr('d', arc)
+          .attr('fill', function(d) {
+            return color1(d.data.label);
+          })
+          .on("mouseover", function () {
+            battleData.forEach(function (battle) {
+              if(battle.Year == "298" && battle.Attacker == "Joffrey Baratheon"){
+              svg.append("svg:image")
+              // .attr('x',battleWhereX(battle))
+              // .attr('y',battleWhereY(battle))
+              .attr('x',+battle.x)
+              .attr('y',+battle.y)
+              .attr('width', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+              .attr('height', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+             .attr("xlink:href","images/p2Red.png")
+             .on("mouseover", function () {
+                // console.log("x:"+this.x.animVal.value);
+                // console.log("y:"+this.y.animVal.value);
+          			svg.select("#battleDetail").text(battle.Battle);
+                svg.select("#Year").text("Year: " + battle.Year);
+                svg.select("#Type").text("Type: " + battle.Type);
+                svg.select("#Attacker").text("Attacker: " + battle.Attacker);
+                svg.select("#Defender").text("Defender: " + battle.Defender);
+                // svg.select("#AttackerImg").attr("xlink:href","images/"+battle.Attacker+".jpg");
+                // svg.select("#DefenderImg").attr("xlink:href","images/"+battle.Defender+".jpg");
+                svg.select("#AttackerImg").attr("xlink:href",function(){
+                  if (battle.Result == "win"){return "images/"+battle.Attacker+".jpg";}
+                  else{return "images/"+battle.Attacker+"Lose.jpg";}
+                });
+                svg.select("#DefenderImg").attr("xlink:href",function(){
+                  if (battle.Result == "win"){return "images/"+battle.Defender+"Lose.jpg";}
+                  else{return "images/"+battle.Defender+".jpg";}
+                });
+                svg.select("#winner").attr("x",function(){
+                  if (battle.Result == "win"){return 420;}
+                  else{return 670;}
+                }).attr('y',350).attr('width', 100)
+                .attr('height', 150);
+                svg.select("#winText").attr("x",function(){
+                  if (battle.Result == "win"){return 440;}
+                  else{return 690;}
+                }).attr("y", 520);
+                svg.append("svg:image")
+                .attr('x', 560)
+                .attr('y',400)
+                .attr('width', 60)
+                .attr('height', 60)
+                .attr("xlink:href","images/vs.png");
+          		});
+            }
+            else{
+              svg.append("svg:image")
+              // .attr('x',battleWhereX(battle))
+              // .attr('y',battleWhereY(battle))
+              .attr('x',+battle.x)
+              .attr('y',+battle.y)
+              .attr('width', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+              .attr('height', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+             .attr("xlink:href","images/p2.png")
+             .on("mouseover", function () {
+                // console.log("x:"+this.x.animVal.value);
+                // console.log("y:"+this.y.animVal.value);
+          			svg.select("#battleDetail").text(battle.Battle);
+                svg.select("#Year").text("Year: " + battle.Year);
+                svg.select("#Type").text("Type: " + battle.Type);
+                svg.select("#Attacker").text("Attacker: " + battle.Attacker);
+                svg.select("#Defender").text("Defender: " + battle.Defender);
+                // svg.select("#AttackerImg").attr("xlink:href","images/"+battle.Attacker+".jpg");
+                // svg.select("#DefenderImg").attr("xlink:href","images/"+battle.Defender+".jpg");
+                svg.select("#AttackerImg").attr("xlink:href",function(){
+                  if (battle.Result == "win"){return "images/"+battle.Attacker+".jpg";}
+                  else{return "images/"+battle.Attacker+"Lose.jpg";}
+                });
+                svg.select("#DefenderImg").attr("xlink:href",function(){
+                  if (battle.Result == "win"){return "images/"+battle.Defender+"Lose.jpg";}
+                  else{return "images/"+battle.Defender+".jpg";}
+                });
+                svg.select("#winner").attr("x",function(){
+                  if (battle.Result == "win"){return 420;}
+                  else{return 670;}
+                }).attr('y',350).attr('width', 100)
+                .attr('height', 150);
+                svg.select("#winText").attr("x",function(){
+                  if (battle.Result == "win"){return 440;}
+                  else{return 690;}
+                }).attr("y", 520);
+                svg.append("svg:image")
+                .attr('x', 560)
+                .attr('y',400)
+                .attr('width', 60)
+                .attr('height', 60)
+                .attr("xlink:href","images/vs.png");
+          		});
+            }
+            });
+            svg.append("text")
+            .text("Win:4 Lose:0")
+            .attr("id","t11")
+            .attr('x',360)
+            .attr('y',yScale(4)-15)
+            .attr("fill", "Black")
+            .style("font-size", "10px");
+            svg.append("text")
+            .text("Win Percentage: 100%")
+            .attr("id","t12")
+            .attr('x',320)
+            .attr('y',yScale(4)-3)
+            .attr("fill", "Black")
+            .style("font-size", "10px");
+          })
+          .on("mouseout", function(){
+            svg.selectAll("#t11").attr("fill","none");
+            svg.selectAll("#t12").attr("fill","none");
+          });
+
+
+//pie 2
+var j299 = [
+        { label: 'win', count: 3 },
+        { label: 'lose', count: 1 }
+      ];
+ var color1 = d3.scaleOrdinal()
+.range(['#ff0000', '#ffb3b3']);
+      var arc = d3.arc()
+        .innerRadius(0)
+        .outerRadius(radius);
+      var path2 = svg.append('g').selectAll('path')
+        .data(pie(j299))
+        .enter()
+        .append('path')
+         .attr('transform', 'translate(525,'+yScale(4)+')')
+        .attr('d', arc)
+        .attr('fill', function(d) {
+          return color1(d.data.label);
+        })
+        .on("mouseover", function () {
+          battleData.forEach(function (battle) {
+            if(battle.Year == "299" && battle.Attacker == "Joffrey Baratheon"){
+            svg.append("svg:image")
+            // .attr('x',battleWhereX(battle))
+            // .attr('y',battleWhereY(battle))
+            .attr('x',+battle.x)
+            .attr('y',+battle.y)
+            .attr('width', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+            .attr('height', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+           .attr("xlink:href","images/p2Red.png")
+           .on("mouseover", function () {
+              // console.log("x:"+this.x.animVal.value);
+              // console.log("y:"+this.y.animVal.value);
+              svg.select("#battleDetail").text(battle.Battle);
+              svg.select("#Year").text("Year: " + battle.Year);
+              svg.select("#Type").text("Type: " + battle.Type);
+              svg.select("#Attacker").text("Attacker: " + battle.Attacker);
+              svg.select("#Defender").text("Defender: " + battle.Defender);
+              // svg.select("#AttackerImg").attr("xlink:href","images/"+battle.Attacker+".jpg");
+              // svg.select("#DefenderImg").attr("xlink:href","images/"+battle.Defender+".jpg");
+              svg.select("#AttackerImg").attr("xlink:href",function(){
+                if (battle.Result == "win"){return "images/"+battle.Attacker+".jpg";}
+                else{return "images/"+battle.Attacker+"Lose.jpg";}
+              });
+              svg.select("#DefenderImg").attr("xlink:href",function(){
+                if (battle.Result == "win"){return "images/"+battle.Defender+"Lose.jpg";}
+                else{return "images/"+battle.Defender+".jpg";}
+              });
+              svg.select("#winner").attr("x",function(){
+                if (battle.Result == "win"){return 420;}
+                else{return 670;}
+              }).attr('y',350).attr('width', 100)
+              .attr('height', 150);
+              svg.select("#winText").attr("x",function(){
+                if (battle.Result == "win"){return 440;}
+                else{return 690;}
+              }).attr("y", 520);
+              svg.append("svg:image")
+              .attr('x', 560)
+              .attr('y',400)
+              .attr('width', 60)
+              .attr('height', 60)
+              .attr("xlink:href","images/vs.png");
+            });
+          }
+          else{
+            svg.append("svg:image")
+            // .attr('x',battleWhereX(battle))
+            // .attr('y',battleWhereY(battle))
+            .attr('x',+battle.x)
+            .attr('y',+battle.y)
+            .attr('width', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+            .attr('height', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+           .attr("xlink:href","images/p2.png")
+           .on("mouseover", function () {
+              // console.log("x:"+this.x.animVal.value);
+              // console.log("y:"+this.y.animVal.value);
+              svg.select("#battleDetail").text(battle.Battle);
+              svg.select("#Year").text("Year: " + battle.Year);
+              svg.select("#Type").text("Type: " + battle.Type);
+              svg.select("#Attacker").text("Attacker: " + battle.Attacker);
+              svg.select("#Defender").text("Defender: " + battle.Defender);
+              // svg.select("#AttackerImg").attr("xlink:href","images/"+battle.Attacker+".jpg");
+              // svg.select("#DefenderImg").attr("xlink:href","images/"+battle.Defender+".jpg");
+              svg.select("#AttackerImg").attr("xlink:href",function(){
+                if (battle.Result == "win"){return "images/"+battle.Attacker+".jpg";}
+                else{return "images/"+battle.Attacker+"Lose.jpg";}
+              });
+              svg.select("#DefenderImg").attr("xlink:href",function(){
+                if (battle.Result == "win"){return "images/"+battle.Defender+"Lose.jpg";}
+                else{return "images/"+battle.Defender+".jpg";}
+              });
+              svg.select("#winner").attr("x",function(){
+                if (battle.Result == "win"){return 420;}
+                else{return 670;}
+              }).attr('y',350).attr('width', 100)
+              .attr('height', 150);
+              svg.select("#winText").attr("x",function(){
+                if (battle.Result == "win"){return 440;}
+                else{return 690;}
+              }).attr("y", 520);
+              svg.append("svg:image")
+              .attr('x', 560)
+              .attr('y',400)
+              .attr('width', 60)
+              .attr('height', 60)
+              .attr("xlink:href","images/vs.png");
+            });
+          }
+          });
+          svg.append("text")
+          .text("Win:3 Lose:1")
+          .attr("id","t21")
+          .attr('x',529)
+          .attr('y',yScale(4)-3)
+          .attr("fill", "Black")
+          .style("font-size", "10px");
+          svg.append("text")
+          .text("Win Percentage: 75%")
+          .attr("id","t22")
+          .attr('x',529)
+          .attr('y',yScale(4)+10)
+          .attr("fill", "Black")
+          .style("font-size", "10px");
+        })
+        .on("mouseout", function(){
+          svg.selectAll("#t21").attr("fill","none");
+          svg.selectAll("#t22").attr("fill","none");
+        });
+
+
+
+     //pie 3
+     var j300 = [
+             { label: 'win', count: 5 },
+             { label: 'lose', count: 0 }
+           ];
+      var color1 = d3.scaleOrdinal()
+     .range(['#ff0000', '#ffb3b3']);
+           var arc = d3.arc()
+             .innerRadius(0)
+             .outerRadius(radius);
+           var path2 = svg.append('g').selectAll('path')
+             .data(pie(j300))
+             .enter()
+             .append('path')
+              .attr('transform', 'translate(637.5,'+yScale(5)+')')
+             .attr('d', arc)
+             .attr('fill', function(d) {
+               return color1(d.data.label);
+             })
+             .on("mouseover", function () {
+               battleData.forEach(function (battle) {
+                 if(battle.Year == "300" && battle.Attacker == "Joffrey Baratheon"){
+                 svg.append("svg:image")
+                 // .attr('x',battleWhereX(battle))
+                 // .attr('y',battleWhereY(battle))
+                 .attr('x',+battle.x)
+                 .attr('y',+battle.y)
+                 .attr('width', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                 .attr('height', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                .attr("xlink:href","images/p2Red.png")
+                .on("mouseover", function () {
+                   // console.log("x:"+this.x.animVal.value);
+                   // console.log("y:"+this.y.animVal.value);
+                   svg.select("#battleDetail").text(battle.Battle);
+                   svg.select("#Year").text("Year: " + battle.Year);
+                   svg.select("#Type").text("Type: " + battle.Type);
+                   svg.select("#Attacker").text("Attacker: " + battle.Attacker);
+                   svg.select("#Defender").text("Defender: " + battle.Defender);
+                   // svg.select("#AttackerImg").attr("xlink:href","images/"+battle.Attacker+".jpg");
+                   // svg.select("#DefenderImg").attr("xlink:href","images/"+battle.Defender+".jpg");
+                   svg.select("#AttackerImg").attr("xlink:href",function(){
+                     if (battle.Result == "win"){return "images/"+battle.Attacker+".jpg";}
+                     else{return "images/"+battle.Attacker+"Lose.jpg";}
+                   });
+                   svg.select("#DefenderImg").attr("xlink:href",function(){
+                     if (battle.Result == "win"){return "images/"+battle.Defender+"Lose.jpg";}
+                     else{return "images/"+battle.Defender+".jpg";}
+                   });
+                   svg.select("#winner").attr("x",function(){
+                     if (battle.Result == "win"){return 420;}
+                     else{return 670;}
+                   }).attr('y',350).attr('width', 100)
+                   .attr('height', 150);
+                   svg.select("#winText").attr("x",function(){
+                     if (battle.Result == "win"){return 440;}
+                     else{return 690;}
+                   }).attr("y", 520);
+                   svg.append("svg:image")
+                   .attr('x', 560)
+                   .attr('y',400)
+                   .attr('width', 60)
+                   .attr('height', 60)
+                   .attr("xlink:href","images/vs.png");
+                 });
+               }
+               else{
+                 svg.append("svg:image")
+                 // .attr('x',battleWhereX(battle))
+                 // .attr('y',battleWhereY(battle))
+                 .attr('x',+battle.x)
+                 .attr('y',+battle.y)
+                 .attr('width', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                 .attr('height', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                .attr("xlink:href","images/p2.png")
+                .on("mouseover", function () {
+                   // console.log("x:"+this.x.animVal.value);
+                   // console.log("y:"+this.y.animVal.value);
+             			svg.select("#battleDetail").text(battle.Battle);
+                   svg.select("#Year").text("Year: " + battle.Year);
+                   svg.select("#Type").text("Type: " + battle.Type);
+                   svg.select("#Attacker").text("Attacker: " + battle.Attacker);
+                   svg.select("#Defender").text("Defender: " + battle.Defender);
+                   // svg.select("#AttackerImg").attr("xlink:href","images/"+battle.Attacker+".jpg");
+                   // svg.select("#DefenderImg").attr("xlink:href","images/"+battle.Defender+".jpg");
+                   svg.select("#AttackerImg").attr("xlink:href",function(){
+                     if (battle.Result == "win"){return "images/"+battle.Attacker+".jpg";}
+                     else{return "images/"+battle.Attacker+"Lose.jpg";}
+                   });
+                   svg.select("#DefenderImg").attr("xlink:href",function(){
+                     if (battle.Result == "win"){return "images/"+battle.Defender+"Lose.jpg";}
+                     else{return "images/"+battle.Defender+".jpg";}
+                   });
+                   svg.select("#winner").attr("x",function(){
+                     if (battle.Result == "win"){return 420;}
+                     else{return 670;}
+                   }).attr('y',350).attr('width', 100)
+                   .attr('height', 150);
+                   svg.select("#winText").attr("x",function(){
+                     if (battle.Result == "win"){return 440;}
+                     else{return 690;}
+                   }).attr("y", 520);
+                   svg.append("svg:image")
+                   .attr('x', 560)
+                   .attr('y',400)
+                   .attr('width', 60)
+                   .attr('height', 60)
+                   .attr("xlink:href","images/vs.png");
+             		});
+               }
+               });
+               svg.append("text")
+               .text("Win:5 Lose:0")
+               .attr("id","t31")
+               .attr('x',645)
+               .attr('y',yScale(5)-3)
+               .attr("fill", "black")
+               .style("font-size", "10px");
+               svg.append("text")
+               .text("Win Percentage: 100%")
+               .attr("id","t32")
+               .attr('x',645)
+               .attr('y',yScale(5)+10)
+               .attr("fill", "black")
+               .style("font-size", "10px");
+             })
+             .on("mouseout", function(){
+               svg.selectAll("#t31").attr("fill","none");
+               svg.selectAll("#t32").attr("fill","none");
+             });
+
+             //pie 4
+             var e299 = [
+                     { label: 'win', count: 5 },
+                     { label: 'lose', count: 0 }
+                   ];
+              var color2 = d3.scaleOrdinal()
+             .range(['#ff66ff', '#ffccff']);
+                   var arc = d3.arc()
+                     .innerRadius(0)
+                     .outerRadius(radius);
+                   var path2 = svg.append('g').selectAll('path')
+                     .data(pie(e299))
+                     .enter()
+                     .append('path')
+                      .attr('transform', 'translate(525,'+yScale(5)+')')
+                     .attr('d', arc)
+                     .attr('fill', function(d) {
+                       return color2(d.data.label);
+                     })
+                     .on("mouseover", function () {
+                       battleData.forEach(function (battle) {
+                         if(battle.Year == "299" && battle.Attacker == "Euron Greyjoy"){
+                         svg.append("svg:image")
+                         // .attr('x',battleWhereX(battle))
+                         // .attr('y',battleWhereY(battle))
+                         .attr('x',+battle.x)
+                         .attr('y',+battle.y)
+                         .attr('width', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                         .attr('height', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                        .attr("xlink:href","images/p2Pink.png")
+                        .on("mouseover", function () {
+                           // console.log("x:"+this.x.animVal.value);
+                           // console.log("y:"+this.y.animVal.value);
+                           svg.select("#battleDetail").text(battle.Battle);
+                           svg.select("#Year").text("Year: " + battle.Year);
+                           svg.select("#Type").text("Type: " + battle.Type);
+                           svg.select("#Attacker").text("Attacker: " + battle.Attacker);
+                           svg.select("#Defender").text("Defender: " + battle.Defender);
+                           // svg.select("#AttackerImg").attr("xlink:href","images/"+battle.Attacker+".jpg");
+                           // svg.select("#DefenderImg").attr("xlink:href","images/"+battle.Defender+".jpg");
+                           svg.select("#AttackerImg").attr("xlink:href",function(){
+                             if (battle.Result == "win"){return "images/"+battle.Attacker+".jpg";}
+                             else{return "images/"+battle.Attacker+"Lose.jpg";}
+                           });
+                           svg.select("#DefenderImg").attr("xlink:href",function(){
+                             if (battle.Result == "win"){return "images/"+battle.Defender+"Lose.jpg";}
+                             else{return "images/"+battle.Defender+".jpg";}
+                           });
+                           svg.select("#winner").attr("x",function(){
+                             if (battle.Result == "win"){return 420;}
+                             else{return 670;}
+                           }).attr('y',350).attr('width', 100)
+                           .attr('height', 150);
+                           svg.select("#winText").attr("x",function(){
+                             if (battle.Result == "win"){return 440;}
+                             else{return 690;}
+                           }).attr("y", 520);
+                           svg.append("svg:image")
+                           .attr('x', 560)
+                           .attr('y',400)
+                           .attr('width', 60)
+                           .attr('height', 60)
+                           .attr("xlink:href","images/vs.png");
+                         });
+                       }
+                       else{
+                         svg.append("svg:image")
+                         // .attr('x',battleWhereX(battle))
+                         // .attr('y',battleWhereY(battle))
+                         .attr('x',+battle.x)
+                         .attr('y',+battle.y)
+                         .attr('width', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                         .attr('height', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                        .attr("xlink:href","images/p2.png")
+                        .on("mouseover", function () {
+                           // console.log("x:"+this.x.animVal.value);
+                           // console.log("y:"+this.y.animVal.value);
+                     			svg.select("#battleDetail").text(battle.Battle);
+                           svg.select("#Year").text("Year: " + battle.Year);
+                           svg.select("#Type").text("Type: " + battle.Type);
+                           svg.select("#Attacker").text("Attacker: " + battle.Attacker);
+                           svg.select("#Defender").text("Defender: " + battle.Defender);
+                           // svg.select("#AttackerImg").attr("xlink:href","images/"+battle.Attacker+".jpg");
+                           // svg.select("#DefenderImg").attr("xlink:href","images/"+battle.Defender+".jpg");
+                           svg.select("#AttackerImg").attr("xlink:href",function(){
+                             if (battle.Result == "win"){return "images/"+battle.Attacker+".jpg";}
+                             else{return "images/"+battle.Attacker+"Lose.jpg";}
+                           });
+                           svg.select("#DefenderImg").attr("xlink:href",function(){
+                             if (battle.Result == "win"){return "images/"+battle.Defender+"Lose.jpg";}
+                             else{return "images/"+battle.Defender+".jpg";}
+                           });
+                           svg.select("#winner").attr("x",function(){
+                             if (battle.Result == "win"){return 420;}
+                             else{return 670;}
+                           }).attr('y',350).attr('width', 100)
+                           .attr('height', 150);
+                           svg.select("#winText").attr("x",function(){
+                             if (battle.Result == "win"){return 440;}
+                             else{return 690;}
+                           }).attr("y", 520);
+                           svg.append("svg:image")
+                           .attr('x', 560)
+                           .attr('y',400)
+                           .attr('width', 60)
+                           .attr('height', 60)
+                           .attr("xlink:href","images/vs.png");
+                     		});
+                       }
+                       });
+                       svg.append("text")
+                       .text("Win:5 Lose:0")
+                       .attr("id","t41")
+                       .attr('x',519)
+                       .attr('y',yScale(5)-10)
+                       .attr("fill", "black")
+                       .style("font-size", "10px");
+                       svg.append("text")
+                       .text("Win Percentage: 100%")
+                       .attr("id","t42")
+                       .attr('x',519)
+                       .attr('y',yScale(5)-2)
+                       .attr("fill", "black")
+                       .style("font-size", "10px");
+                     })
+                     .on("mouseout", function(){
+                       svg.selectAll("#t41").attr("fill","none");
+                       svg.selectAll("#t42").attr("fill","none");
+                     });
+
+                     //pie 4
+                     var e300 = [
+                             { label: 'win', count: 2 },
+                             { label: 'lose', count: 0 }
+                           ];
+                      var color2 = d3.scaleOrdinal()
+                     .range(['#ff66ff', '#ffccff']);
+                           var arc = d3.arc()
+                             .innerRadius(0)
+                             .outerRadius(radius);
+                           var path2 = svg.append('g').selectAll('path')
+                             .data(pie(e300))
+                             .enter()
+                             .append('path')
+                              .attr('transform', 'translate(637.5,'+yScale(2)+')')
+                             .attr('d', arc)
+                             .attr('fill', function(d) {
+                               return color2(d.data.label);
+                             })
+                             .on("mouseover", function () {
+                               battleData.forEach(function (battle) {
+                                 if(battle.Year == "300" && battle.Attacker == "Euron Greyjoy"){
+                                 svg.append("svg:image")
+                                 // .attr('x',battleWhereX(battle))
+                                 // .attr('y',battleWhereY(battle))
+                                 .attr('x',+battle.x)
+                                 .attr('y',+battle.y)
+                                 .attr('width', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                                 .attr('height', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                                .attr("xlink:href","images/p2Pink.png")
+                                .on("mouseover", function () {
+                                   // console.log("x:"+this.x.animVal.value);
+                                   // console.log("y:"+this.y.animVal.value);
+                                   svg.select("#battleDetail").text(battle.Battle);
+                                   svg.select("#Year").text("Year: " + battle.Year);
+                                   svg.select("#Type").text("Type: " + battle.Type);
+                                   svg.select("#Attacker").text("Attacker: " + battle.Attacker);
+                                   svg.select("#Defender").text("Defender: " + battle.Defender);
+                                   // svg.select("#AttackerImg").attr("xlink:href","images/"+battle.Attacker+".jpg");
+                                   // svg.select("#DefenderImg").attr("xlink:href","images/"+battle.Defender+".jpg");
+                                   svg.select("#AttackerImg").attr("xlink:href",function(){
+                                     if (battle.Result == "win"){return "images/"+battle.Attacker+".jpg";}
+                                     else{return "images/"+battle.Attacker+"Lose.jpg";}
+                                   });
+                                   svg.select("#DefenderImg").attr("xlink:href",function(){
+                                     if (battle.Result == "win"){return "images/"+battle.Defender+"Lose.jpg";}
+                                     else{return "images/"+battle.Defender+".jpg";}
+                                   });
+                                   svg.select("#winner").attr("x",function(){
+                                     if (battle.Result == "win"){return 420;}
+                                     else{return 670;}
+                                   }).attr('y',350).attr('width', 100)
+                                   .attr('height', 150);
+                                   svg.select("#winText").attr("x",function(){
+                                     if (battle.Result == "win"){return 440;}
+                                     else{return 690;}
+                                   }).attr("y", 520);
+                                   svg.append("svg:image")
+                                   .attr('x', 560)
+                                   .attr('y',400)
+                                   .attr('width', 60)
+                                   .attr('height', 60)
+                                   .attr("xlink:href","images/vs.png");
+                                 });
+                               }
+                               else{
+                                 svg.append("svg:image")
+                                 // .attr('x',battleWhereX(battle))
+                                 // .attr('y',battleWhereY(battle))
+                                 .attr('x',+battle.x)
+                                 .attr('y',+battle.y)
+                                 .attr('width', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                                 .attr('height', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                                .attr("xlink:href","images/p2.png")
+                                .on("mouseover", function () {
+                                   // console.log("x:"+this.x.animVal.value);
+                                   // console.log("y:"+this.y.animVal.value);
+                             			svg.select("#battleDetail").text(battle.Battle);
+                                   svg.select("#Year").text("Year: " + battle.Year);
+                                   svg.select("#Type").text("Type: " + battle.Type);
+                                   svg.select("#Attacker").text("Attacker: " + battle.Attacker);
+                                   svg.select("#Defender").text("Defender: " + battle.Defender);
+                                   // svg.select("#AttackerImg").attr("xlink:href","images/"+battle.Attacker+".jpg");
+                                   // svg.select("#DefenderImg").attr("xlink:href","images/"+battle.Defender+".jpg");
+                                   svg.select("#AttackerImg").attr("xlink:href",function(){
+                                     if (battle.Result == "win"){return "images/"+battle.Attacker+".jpg";}
+                                     else{return "images/"+battle.Attacker+"Lose.jpg";}
+                                   });
+                                   svg.select("#DefenderImg").attr("xlink:href",function(){
+                                     if (battle.Result == "win"){return "images/"+battle.Defender+"Lose.jpg";}
+                                     else{return "images/"+battle.Defender+".jpg";}
+                                   });
+                                   svg.select("#winner").attr("x",function(){
+                                     if (battle.Result == "win"){return 420;}
+                                     else{return 670;}
+                                   }).attr('y',350).attr('width', 100)
+                                   .attr('height', 150);
+                                   svg.select("#winText").attr("x",function(){
+                                     if (battle.Result == "win"){return 440;}
+                                     else{return 690;}
+                                   }).attr("y", 520);
+                                   svg.append("svg:image")
+                                   .attr('x', 560)
+                                   .attr('y',400)
+                                   .attr('width', 60)
+                                   .attr('height', 60)
+                                   .attr("xlink:href","images/vs.png");
+                             		});
+                               }
+                               });
+                               svg.append("text")
+                               .text("Win:2 Lose:0")
+                               .attr("id","t51")
+                               .attr('x',645)
+                               .attr('y',yScale(2)-10)
+                               .attr("fill", "black")
+                               .style("font-size", "10px");
+                               svg.append("text")
+                               .text("Win Percentage: 100%")
+                               .attr("id","t52")
+                               .attr('x',645)
+                               .attr('y',yScale(2))
+                               .attr("fill", "black")
+                               .style("font-size", "10px");
+                             })
+                             .on("mouseout", function(){
+                               svg.selectAll("#t51").attr("fill","none");
+                               svg.selectAll("#t52").attr("fill","none");
+                             });
+
+                             //pie 6
+                             var r298 = [
+                                     { label: 'win', count: 2 },
+                                     { label: 'lose', count: 1 }
+                                   ];
+                              var color3 = d3.scaleOrdinal()
+                             .range(['#0066ff', '#cce0ff']);
+                                   var arc = d3.arc()
+                                     .innerRadius(0)
+                                     .outerRadius(radius);
+                                   var path2 = svg.append('g').selectAll('path')
+                                     .data(pie(r298))
+                                     .enter()
+                                     .append('path')
+                                      .attr('transform', 'translate(412.5,'+yScale(3)+')')
+                                     .attr('d', arc)
+                                     .attr('fill', function(d) {
+                                       return color3(d.data.label);
+                                     })
+                                     .on("mouseover", function () {
+                                       battleData.forEach(function (battle) {
+                                         if(battle.Year == "298" && battle.Attacker == "Robb Stark"){
+                                         svg.append("svg:image")
+                                         // .attr('x',battleWhereX(battle))
+                                         // .attr('y',battleWhereY(battle))
+                                         .attr('x',+battle.x)
+                                         .attr('y',+battle.y)
+                                         .attr('width', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                                         .attr('height', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                                        .attr("xlink:href","images/p2Blue.png")
+                                        .on("mouseover", function () {
+                                           // console.log("x:"+this.x.animVal.value);
+                                           // console.log("y:"+this.y.animVal.value);
+                                           svg.select("#battleDetail").text(battle.Battle);
+                                           svg.select("#Year").text("Year: " + battle.Year);
+                                           svg.select("#Type").text("Type: " + battle.Type);
+                                           svg.select("#Attacker").text("Attacker: " + battle.Attacker);
+                                           svg.select("#Defender").text("Defender: " + battle.Defender);
+                                           // svg.select("#AttackerImg").attr("xlink:href","images/"+battle.Attacker+".jpg");
+                                           // svg.select("#DefenderImg").attr("xlink:href","images/"+battle.Defender+".jpg");
+                                           svg.select("#AttackerImg").attr("xlink:href",function(){
+                                             if (battle.Result == "win"){return "images/"+battle.Attacker+".jpg";}
+                                             else{return "images/"+battle.Attacker+"Lose.jpg";}
+                                           });
+                                           svg.select("#DefenderImg").attr("xlink:href",function(){
+                                             if (battle.Result == "win"){return "images/"+battle.Defender+"Lose.jpg";}
+                                             else{return "images/"+battle.Defender+".jpg";}
+                                           });
+                                           svg.select("#winner").attr("x",function(){
+                                             if (battle.Result == "win"){return 420;}
+                                             else{return 670;}
+                                           }).attr('y',350).attr('width', 100)
+                                           .attr('height', 150);
+                                           svg.select("#winText").attr("x",function(){
+                                             if (battle.Result == "win"){return 440;}
+                                             else{return 690;}
+                                           }).attr("y", 520);
+                                           svg.append("svg:image")
+                                           .attr('x', 560)
+                                           .attr('y',400)
+                                           .attr('width', 60)
+                                           .attr('height', 60)
+                                           .attr("xlink:href","images/vs.png");
+                                         });
+                                       }
+                                       else{
+                                         svg.append("svg:image")
+                                         // .attr('x',battleWhereX(battle))
+                                         // .attr('y',battleWhereY(battle))
+                                         .attr('x',+battle.x)
+                                         .attr('y',+battle.y)
+                                         .attr('width', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                                         .attr('height', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                                        .attr("xlink:href","images/p2.png")
+                                        .on("mouseover", function () {
+                                           // console.log("x:"+this.x.animVal.value);
+                                           // console.log("y:"+this.y.animVal.value);
+                                     			svg.select("#battleDetail").text(battle.Battle);
+                                           svg.select("#Year").text("Year: " + battle.Year);
+                                           svg.select("#Type").text("Type: " + battle.Type);
+                                           svg.select("#Attacker").text("Attacker: " + battle.Attacker);
+                                           svg.select("#Defender").text("Defender: " + battle.Defender);
+                                           // svg.select("#AttackerImg").attr("xlink:href","images/"+battle.Attacker+".jpg");
+                                           // svg.select("#DefenderImg").attr("xlink:href","images/"+battle.Defender+".jpg");
+                                           svg.select("#AttackerImg").attr("xlink:href",function(){
+                                             if (battle.Result == "win"){return "images/"+battle.Attacker+".jpg";}
+                                             else{return "images/"+battle.Attacker+"Lose.jpg";}
+                                           });
+                                           svg.select("#DefenderImg").attr("xlink:href",function(){
+                                             if (battle.Result == "win"){return "images/"+battle.Defender+"Lose.jpg";}
+                                             else{return "images/"+battle.Defender+".jpg";}
+                                           });
+                                           svg.select("#winner").attr("x",function(){
+                                             if (battle.Result == "win"){return 420;}
+                                             else{return 670;}
+                                           }).attr('y',350).attr('width', 100)
+                                           .attr('height', 150);
+                                           svg.select("#winText").attr("x",function(){
+                                             if (battle.Result == "win"){return 440;}
+                                             else{return 690;}
+                                           }).attr("y", 520);
+                                           svg.append("svg:image")
+                                           .attr('x', 560)
+                                           .attr('y',400)
+                                           .attr('width', 60)
+                                           .attr('height', 60)
+                                           .attr("xlink:href","images/vs.png");
+                                     		});
+                                       }
+                                       });
+                                       svg.append("text")
+                                       .text("Win:2 Lose:1")
+                                       .attr("id","t61")
+                                       .attr('x',330)
+                                       .attr('y',yScale(3)-3)
+                                       .attr("fill", "black")
+                                       .style("font-size", "10px");
+                                       svg.append("text")
+                                       .text("Win Percentage: 66.6%")
+                                       .attr("id","t62")
+                                       .attr('x',330)
+                                       .attr('y',yScale(3)+20)
+                                       .attr("fill", "black")
+                                       .style("font-size", "10px");
+                                     })
+                                     .on("mouseout", function(){
+                                       svg.selectAll("#t61").attr("fill","none");
+                                       svg.selectAll("#t62").attr("fill","none");
+                                     });
+
+                                     //pie 7
+                                     var r299 = [
+                                             { label: 'win', count: 6 },
+                                             { label: 'lose', count: 1 }
+                                           ];
+                                      var color3 = d3.scaleOrdinal()
+                                     .range(['#0066ff', '#cce0ff']);
+                                           var arc = d3.arc()
+                                             .innerRadius(0)
+                                             .outerRadius(radius);
+                                           var path2 = svg.append('g').selectAll('path')
+                                             .data(pie(r299))
+                                             .enter()
+                                             .append('path')
+                                              .attr('transform', 'translate(525,'+yScale(7)+')')
+                                             .attr('d', arc)
+                                             .attr('fill', function(d) {
+                                               return color3(d.data.label);
+                                             })
+                                             .on("mouseover", function () {
+                                               battleData.forEach(function (battle) {
+                                                 if(battle.Year == "299" && battle.Attacker == "Robb Stark"){
+                                                 svg.append("svg:image")
+                                                 // .attr('x',battleWhereX(battle))
+                                                 // .attr('y',battleWhereY(battle))
+                                                 .attr('x',+battle.x)
+                                                 .attr('y',+battle.y)
+                                                 .attr('width', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                                                 .attr('height', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                                                .attr("xlink:href","images/p2Blue.png")
+                                                .on("mouseover", function () {
+                                                   // console.log("x:"+this.x.animVal.value);
+                                                   // console.log("y:"+this.y.animVal.value);
+                                                   svg.select("#battleDetail").text(battle.Battle);
+                                                   svg.select("#Year").text("Year: " + battle.Year);
+                                                   svg.select("#Type").text("Type: " + battle.Type);
+                                                   svg.select("#Attacker").text("Attacker: " + battle.Attacker);
+                                                   svg.select("#Defender").text("Defender: " + battle.Defender);
+                                                   // svg.select("#AttackerImg").attr("xlink:href","images/"+battle.Attacker+".jpg");
+                                                   // svg.select("#DefenderImg").attr("xlink:href","images/"+battle.Defender+".jpg");
+                                                   svg.select("#AttackerImg").attr("xlink:href",function(){
+                                                     if (battle.Result == "win"){return "images/"+battle.Attacker+".jpg";}
+                                                     else{return "images/"+battle.Attacker+"Lose.jpg";}
+                                                   });
+                                                   svg.select("#DefenderImg").attr("xlink:href",function(){
+                                                     if (battle.Result == "win"){return "images/"+battle.Defender+"Lose.jpg";}
+                                                     else{return "images/"+battle.Defender+".jpg";}
+                                                   });
+                                                   svg.select("#winner").attr("x",function(){
+                                                     if (battle.Result == "win"){return 420;}
+                                                     else{return 670;}
+                                                   }).attr('y',350).attr('width', 100)
+                                                   .attr('height', 150);
+                                                   svg.select("#winText").attr("x",function(){
+                                                     if (battle.Result == "win"){return 440;}
+                                                     else{return 690;}
+                                                   }).attr("y", 520);
+                                                   svg.append("svg:image")
+                                                   .attr('x', 560)
+                                                   .attr('y',400)
+                                                   .attr('width', 60)
+                                                   .attr('height', 60)
+                                                   .attr("xlink:href","images/vs.png");
+                                                 });
+                                               }
+                                               else{
+                                                 svg.append("svg:image")
+                                                 // .attr('x',battleWhereX(battle))
+                                                 // .attr('y',battleWhereY(battle))
+                                                 .attr('x',+battle.x)
+                                                 .attr('y',+battle.y)
+                                                 .attr('width', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                                                 .attr('height', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                                                .attr("xlink:href","images/p2.png")
+                                                .on("mouseover", function () {
+                                                   // console.log("x:"+this.x.animVal.value);
+                                                   // console.log("y:"+this.y.animVal.value);
+                                             			svg.select("#battleDetail").text(battle.Battle);
+                                                   svg.select("#Year").text("Year: " + battle.Year);
+                                                   svg.select("#Type").text("Type: " + battle.Type);
+                                                   svg.select("#Attacker").text("Attacker: " + battle.Attacker);
+                                                   svg.select("#Defender").text("Defender: " + battle.Defender);
+                                                   // svg.select("#AttackerImg").attr("xlink:href","images/"+battle.Attacker+".jpg");
+                                                   // svg.select("#DefenderImg").attr("xlink:href","images/"+battle.Defender+".jpg");
+                                                   svg.select("#AttackerImg").attr("xlink:href",function(){
+                                                     if (battle.Result == "win"){return "images/"+battle.Attacker+".jpg";}
+                                                     else{return "images/"+battle.Attacker+"Lose.jpg";}
+                                                   });
+                                                   svg.select("#DefenderImg").attr("xlink:href",function(){
+                                                     if (battle.Result == "win"){return "images/"+battle.Defender+"Lose.jpg";}
+                                                     else{return "images/"+battle.Defender+".jpg";}
+                                                   });
+                                                   svg.select("#winner").attr("x",function(){
+                                                     if (battle.Result == "win"){return 420;}
+                                                     else{return 670;}
+                                                   }).attr('y',350).attr('width', 100)
+                                                   .attr('height', 150);
+                                                   svg.select("#winText").attr("x",function(){
+                                                     if (battle.Result == "win"){return 440;}
+                                                     else{return 690;}
+                                                   }).attr("y", 520);
+                                                   svg.append("svg:image")
+                                                   .attr('x', 560)
+                                                   .attr('y',400)
+                                                   .attr('width', 60)
+                                                   .attr('height', 60)
+                                                   .attr("xlink:href","images/vs.png");
+                                             		});
+                                               }
+                                               });
+                                               svg.append("text")
+                                               .text("Win:6 Lose:1")
+                                               .attr("id","t71")
+                                               .attr('x',530)
+                                               .attr('y',yScale(7)-3)
+                                               .attr("fill", "black")
+                                               .style("font-size", "10px");
+                                               svg.append("text")
+                                               .text("Win Percentage: 85.7%")
+                                               .attr("id","t72")
+                                               .attr('x',530)
+                                               .attr('y',yScale(7)+15)
+                                               .attr("fill", "black")
+                                               .style("font-size", "10px");
+                                             })
+                                             .on("mouseout", function(){
+                                               svg.selectAll("#t71").attr("fill","none");
+                                               svg.selectAll("#t72").attr("fill","none");
+                                             });
+
+                                             //pie 8
+                                             var s299 = [
+                                                     { label: 'win', count: 1 },
+                                                     { label: 'lose', count: 1 }
+                                                   ];
+                                              var color4 = d3.scaleOrdinal()
+                                             .range(['#dbb408', '#ffffe6']);
+                                                   var arc = d3.arc()
+                                                     .innerRadius(0)
+                                                     .outerRadius(radius);
+                                                   var path2 = svg.append('g').selectAll('path')
+                                                     .data(pie(s299))
+                                                     .enter()
+                                                     .append('path')
+                                                      .attr('transform', 'translate(525,'+yScale(2)+')')
+                                                     .attr('d', arc)
+                                                     .attr('fill', function(d) {
+                                                       return color4(d.data.label);
+                                                     })
+                                                     .on("mouseover", function () {
+                                                       battleData.forEach(function (battle) {
+                                                         if(battle.Year == "299" && battle.Attacker == "Stannis Baratheon"){
+                                                         svg.append("svg:image")
+                                                         // .attr('x',battleWhereX(battle))
+                                                         // .attr('y',battleWhereY(battle))
+                                                         .attr('x',+battle.x)
+                                                         .attr('y',+battle.y)
+                                                         .attr('width', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                                                         .attr('height', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                                                        .attr("xlink:href","images/p2Yellow.png")
+                                                        .on("mouseover", function () {
+                                                           // console.log("x:"+this.x.animVal.value);
+                                                           // console.log("y:"+this.y.animVal.value);
+                                                           svg.select("#battleDetail").text(battle.Battle);
+                                                           svg.select("#Year").text("Year: " + battle.Year);
+                                                           svg.select("#Type").text("Type: " + battle.Type);
+                                                           svg.select("#Attacker").text("Attacker: " + battle.Attacker);
+                                                           svg.select("#Defender").text("Defender: " + battle.Defender);
+                                                           // svg.select("#AttackerImg").attr("xlink:href","images/"+battle.Attacker+".jpg");
+                                                           // svg.select("#DefenderImg").attr("xlink:href","images/"+battle.Defender+".jpg");
+                                                           svg.select("#AttackerImg").attr("xlink:href",function(){
+                                                             if (battle.Result == "win"){return "images/"+battle.Attacker+".jpg";}
+                                                             else{return "images/"+battle.Attacker+"Lose.jpg";}
+                                                           });
+                                                           svg.select("#DefenderImg").attr("xlink:href",function(){
+                                                             if (battle.Result == "win"){return "images/"+battle.Defender+"Lose.jpg";}
+                                                             else{return "images/"+battle.Defender+".jpg";}
+                                                           });
+                                                           svg.select("#winner").attr("x",function(){
+                                                             if (battle.Result == "win"){return 420;}
+                                                             else{return 670;}
+                                                           }).attr('y',350).attr('width', 100)
+                                                           .attr('height', 150);
+                                                           svg.select("#winText").attr("x",function(){
+                                                             if (battle.Result == "win"){return 440;}
+                                                             else{return 690;}
+                                                           }).attr("y", 520);
+                                                           svg.append("svg:image")
+                                                           .attr('x', 560)
+                                                           .attr('y',400)
+                                                           .attr('width', 60)
+                                                           .attr('height', 60)
+                                                           .attr("xlink:href","images/vs.png");
+                                                         });
+                                                       }
+                                                       else{
+                                                         svg.append("svg:image")
+                                                         // .attr('x',battleWhereX(battle))
+                                                         // .attr('y',battleWhereY(battle))
+                                                         .attr('x',+battle.x)
+                                                         .attr('y',+battle.y)
+                                                         .attr('width', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                                                         .attr('height', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                                                        .attr("xlink:href","images/p2.png")
+                                                        .on("mouseover", function () {
+                                                           // console.log("x:"+this.x.animVal.value);
+                                                           // console.log("y:"+this.y.animVal.value);
+                                                     			svg.select("#battleDetail").text(battle.Battle);
+                                                           svg.select("#Year").text("Year: " + battle.Year);
+                                                           svg.select("#Type").text("Type: " + battle.Type);
+                                                           svg.select("#Attacker").text("Attacker: " + battle.Attacker);
+                                                           svg.select("#Defender").text("Defender: " + battle.Defender);
+                                                           // svg.select("#AttackerImg").attr("xlink:href","images/"+battle.Attacker+".jpg");
+                                                           // svg.select("#DefenderImg").attr("xlink:href","images/"+battle.Defender+".jpg");
+                                                           svg.select("#AttackerImg").attr("xlink:href",function(){
+                                                             if (battle.Result == "win"){return "images/"+battle.Attacker+".jpg";}
+                                                             else{return "images/"+battle.Attacker+"Lose.jpg";}
+                                                           });
+                                                           svg.select("#DefenderImg").attr("xlink:href",function(){
+                                                             if (battle.Result == "win"){return "images/"+battle.Defender+"Lose.jpg";}
+                                                             else{return "images/"+battle.Defender+".jpg";}
+                                                           });
+                                                           svg.select("#winner").attr("x",function(){
+                                                             if (battle.Result == "win"){return 420;}
+                                                             else{return 670;}
+                                                           }).attr('y',350).attr('width', 100)
+                                                           .attr('height', 150);
+                                                           svg.select("#winText").attr("x",function(){
+                                                             if (battle.Result == "win"){return 440;}
+                                                             else{return 690;}
+                                                           }).attr("y", 520);
+                                                           svg.append("svg:image")
+                                                           .attr('x', 560)
+                                                           .attr('y',400)
+                                                           .attr('width', 60)
+                                                           .attr('height', 60)
+                                                           .attr("xlink:href","images/vs.png");
+                                                     		});
+                                                       }
+                                                       });
+                                                       svg.append("text")
+                                                       .text("Win:1 Lose:1")
+                                                       .attr("id","t81")
+                                                       .attr('x',530)
+                                                       .attr('y',yScale(2)-3)
+                                                       .attr("fill", "black")
+                                                       .style("font-size", "10px");
+                                                       svg.append("text")
+                                                       .text("Win Percentage: 50%")
+                                                       .attr("id","t82")
+                                                       .attr('x',530)
+                                                       .attr('y',yScale(2)+15)
+                                                       .attr("fill", "black")
+                                                       .style("font-size", "10px");
+                                                 })
+                                                 .on("mouseout", function(){
+                                                   svg.selectAll("#t81").attr("fill","none");
+                                                   svg.selectAll("#t82").attr("fill","none");
+                                                 });
+
+                                                 //pie 8
+                                                 var s300 = [
+                                                         { label: 'win', count: 1 },
+                                                         { label: 'lose', count: 2 }
+                                                       ];
+                                                  var color4 = d3.scaleOrdinal()
+                                                 .range(['#dbb408', '#ffffe6']);
+                                                       var arc = d3.arc()
+                                                         .innerRadius(0)
+                                                         .outerRadius(radius);
+                                                       var path2 = svg.append('g').selectAll('path')
+                                                         .data(pie(s300))
+                                                         .enter()
+                                                         .append('path')
+                                                          .attr('transform', 'translate(637.5,'+yScale(3)+')')
+                                                         .attr('d', arc)
+                                                         .attr('fill', function(d) {
+                                                           return color4(d.data.label);
+                                                         })
+                                                         .on("mouseover", function () {
+                                                           battleData.forEach(function (battle) {
+                                                             if(battle.Year == "300" && battle.Attacker == "Stannis Baratheon"){
+                                                             svg.append("svg:image")
+                                                             // .attr('x',battleWhereX(battle))
+                                                             // .attr('y',battleWhereY(battle))
+                                                             .attr('x',+battle.x)
+                                                             .attr('y',+battle.y)
+                                                             .attr('width', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                                                             .attr('height', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                                                            .attr("xlink:href","images/p2Yellow.png")
+                                                            .on("mouseover", function () {
+                                                               // console.log("x:"+this.x.animVal.value);
+                                                               // console.log("y:"+this.y.animVal.value);
+                                                               svg.select("#battleDetail").text(battle.Battle);
+                                                               svg.select("#Year").text("Year: " + battle.Year);
+                                                               svg.select("#Type").text("Type: " + battle.Type);
+                                                               svg.select("#Attacker").text("Attacker: " + battle.Attacker);
+                                                               svg.select("#Defender").text("Defender: " + battle.Defender);
+                                                               // svg.select("#AttackerImg").attr("xlink:href","images/"+battle.Attacker+".jpg");
+                                                               // svg.select("#DefenderImg").attr("xlink:href","images/"+battle.Defender+".jpg");
+                                                               svg.select("#AttackerImg").attr("xlink:href",function(){
+                                                                 if (battle.Result == "win"){return "images/"+battle.Attacker+".jpg";}
+                                                                 else{return "images/"+battle.Attacker+"Lose.jpg";}
+                                                               });
+                                                               svg.select("#DefenderImg").attr("xlink:href",function(){
+                                                                 if (battle.Result == "win"){return "images/"+battle.Defender+"Lose.jpg";}
+                                                                 else{return "images/"+battle.Defender+".jpg";}
+                                                               });
+                                                               svg.select("#winner").attr("x",function(){
+                                                                 if (battle.Result == "win"){return 420;}
+                                                                 else{return 670;}
+                                                               }).attr('y',350).attr('width', 100)
+                                                               .attr('height', 150);
+                                                               svg.select("#winText").attr("x",function(){
+                                                                 if (battle.Result == "win"){return 440;}
+                                                                 else{return 690;}
+                                                               }).attr("y", 520);
+                                                               svg.append("svg:image")
+                                                               .attr('x', 560)
+                                                               .attr('y',400)
+                                                               .attr('width', 60)
+                                                               .attr('height', 60)
+                                                               .attr("xlink:href","images/vs.png");
+                                                             });
+                                                           }else{
+                                                             svg.append("svg:image")
+                                                             // .attr('x',battleWhereX(battle))
+                                                             // .attr('y',battleWhereY(battle))
+                                                             .attr('x',+battle.x)
+                                                             .attr('y',+battle.y)
+                                                             .attr('width', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                                                             .attr('height', sizeQuantizeScale((battle.SizeDefender+battle.SizeAttacker)))
+                                                            .attr("xlink:href","images/p2.png")
+                                                            .on("mouseover", function () {
+                                                               // console.log("x:"+this.x.animVal.value);
+                                                               // console.log("y:"+this.y.animVal.value);
+                                                         			svg.select("#battleDetail").text(battle.Battle);
+                                                               svg.select("#Year").text("Year: " + battle.Year);
+                                                               svg.select("#Type").text("Type: " + battle.Type);
+                                                               svg.select("#Attacker").text("Attacker: " + battle.Attacker);
+                                                               svg.select("#Defender").text("Defender: " + battle.Defender);
+                                                               // svg.select("#AttackerImg").attr("xlink:href","images/"+battle.Attacker+".jpg");
+                                                               // svg.select("#DefenderImg").attr("xlink:href","images/"+battle.Defender+".jpg");
+                                                               svg.select("#AttackerImg").attr("xlink:href",function(){
+                                                                 if (battle.Result == "win"){return "images/"+battle.Attacker+".jpg";}
+                                                                 else{return "images/"+battle.Attacker+"Lose.jpg";}
+                                                               });
+                                                               svg.select("#DefenderImg").attr("xlink:href",function(){
+                                                                 if (battle.Result == "win"){return "images/"+battle.Defender+"Lose.jpg";}
+                                                                 else{return "images/"+battle.Defender+".jpg";}
+                                                               });
+                                                               svg.select("#winner").attr("x",function(){
+                                                                 if (battle.Result == "win"){return 420;}
+                                                                 else{return 670;}
+                                                               }).attr('y',350).attr('width', 100)
+                                                               .attr('height', 150);
+                                                               svg.select("#winText").attr("x",function(){
+                                                                 if (battle.Result == "win"){return 440;}
+                                                                 else{return 690;}
+                                                               }).attr("y", 520);
+                                                               svg.append("svg:image")
+                                                               .attr('x', 560)
+                                                               .attr('y',400)
+                                                               .attr('width', 60)
+                                                               .attr('height', 60)
+                                                               .attr("xlink:href","images/vs.png");
+                                                         		});
+                                                           }
+                                                           });
+                                                           svg.append("text")
+                                                           .text("Win:1 Lose:2")
+                                                           .attr("id","t91")
+                                                           .attr('x',660)
+                                                           .attr('y',yScale(3)-3)
+                                                           .attr("fill", "black")
+                                                           .style("font-size", "10px");
+                                                           svg.append("text")
+                                                           .text("Win Percentage: 33.3%")
+                                                           .attr("id","t92")
+                                                           .attr('x',660)
+                                                           .attr('y',yScale(3)+10)
+                                                           .attr("fill", "black")
+                                                           .style("font-size", "10px");
+                                                         })
+                                                         .on("mouseout", function(){
+                                                           svg.selectAll("#t91").attr("fill","none");
+                                                           svg.selectAll("#t92").attr("fill","none");
+                                                         });
+
+                                                         //connect each pie
+                                                         svg.append("line")
+                                                         .style("stroke","red")
+                                                         .style("stroke-width",4)
+                                                         .attr("x1", 412.5)
+                                                         .attr("y1", yScale(4))
+                                                         .attr("x2", 525)
+                                                         .attr("y2", yScale(4));
+
+                                                         svg.append("line")
+                                                         .style("stroke","red")
+                                                         .style("stroke-width",4)
+                                                         .attr("x1", 637.5)
+                                                         .attr("y1", yScale(5))
+                                                         .attr("x2", 525)
+                                                         .attr("y2", yScale(4));
+
+                                                         svg.append("line")
+                                                         .style("stroke","#0066ff")
+                                                         .style("stroke-width",4)
+                                                         .attr("x1", 412.5)
+                                                         .attr("y1", yScale(3)+3)
+                                                         .attr("x2", 525)
+                                                         .attr("y2", yScale(7));
+
+                                                         svg.append("line")
+                                                         .style("stroke","#ff66ff")
+                                                         .style("stroke-width",4)
+                                                         .attr("x1", 637.5)
+                                                         .attr("y1", yScale(2))
+                                                         .attr("x2", 525)
+                                                         .attr("y2", yScale(5));
+
+                                                         svg.append("line")
+                                                         .style("stroke","#dbb408")
+                                                         .style("stroke-width",4)
+                                                         .attr("x1", 637.5)
+                                                         .attr("y1", yScale(3))
+                                                         .attr("x2", 525)
+                                                         .attr("y2", yScale(2));
+});
+//label
+svg.append("text")
+.text("Attacker King:")
+.attr("x",670)
+.attr("y",60)
+.attr("font-family", "sans-serif")
+.attr("font-size", "12px")
+.style("fill","black");
+svg.append("circle")
+.attr("cx",680)
+.attr("cy",80)
+.attr("r",5)
+.style("fill","red");
+svg.append("text")
+.text("Joffrey Baratheon")
+.attr("x",690)
+.attr("y",85)
+.attr("font-family", "sans-serif")
+.attr("font-size", "12px")
+.style("fill","red");
+svg.append("circle")
+.attr("cx",680)
+.attr("cy",100)
+.attr("r",5)
+.style("fill","#0066ff");
+svg.append("text")
+.text("Robb Stark")
+.attr("x",690)
+.attr("y",105)
+.attr("font-family", "sans-serif")
+.attr("font-size", "12px")
+.style("fill","#0066ff");
+svg.append("circle")
+.attr("cx",680)
+.attr("cy",120)
+.attr("r",5)
+.style("fill","#dbb408");
+svg.append("text")
+.text("Stannis Baratheon")
+.attr("x",690)
+.attr("y",125)
+.attr("font-family", "sans-serif")
+.attr("font-size", "12px")
+.style("fill","#dbb408");
+svg.append("circle")
+.attr("cx",680)
+.attr("cy",138)
+.attr("r",5)
+.style("fill","#ff66ff");
+svg.append("text")
+.text("Euron Greyjoy")
+.attr("x",690)
+.attr("y",143)
+.attr("font-family", "sans-serif")
+.attr("font-size", "12px")
+.style("fill","#ff66ff");
+svg.append("text")
+.text("Battle Launch Amount And Win Percentage")
+.attr("x",390)
+.attr("y",30)
+.attr("font-family", "Impact")
+.attr("font-size", "15px")
+.style("fill","black");
+svg.append("text")
+.text("Hover each pie circle to see the change")
+.attr("x",430)
+.attr("y",40)
+.attr("font-size", "10px")
+.style("fill","black");
+//title
+svg.append("text")
+.text("Battle Map")
+.attr("x",770)
+.attr("y",30)
+.attr("font-family", "Impact")
+.attr("font-size", "40px")
+.style("fill","#272e51");
+
+});
+
+
+
+
+
+</script>
+</body>
+</html>

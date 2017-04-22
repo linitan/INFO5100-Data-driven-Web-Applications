@@ -1,0 +1,121 @@
+html, body {
+    border: 0;
+    font: inherit;
+    font-size: 100%;
+    margin: 0;
+    padding: 0;
+    vertical-align: baseline;
+    overflow-x: hidden;
+}
+
+body {
+  background-color: #2D2727;
+}
+
+#banner {
+  padding: 1em 5em 5em 10em;
+  /*background-attachment: fixed;*/
+  /*background-image: url("../images/overlay.png"), url("../images/p1.jpg");*/
+  background-image: url("../images/p1.jpg");
+  /*the overlay.png and p1.jpg are all created by myself(Lini Tan)*/
+  background-position: center top;
+  background-size: cover;
+  line-height: 1.75;
+  text-align: center;
+}
+
+#banner:last-child {
+    margin-bottom: 0;
+}
+
+#linePlot{
+/*margin-left: 10em;*/
+}
+
+#banner2 {
+  padding: 1em 5em 5em 10em;
+  /*background-attachment: fixed;*/
+  /*background-image: url("../images/overlay.png"), url("../images/background2.jpg");*/
+  background-image: url("../images/p1v2.jpg");
+  /*the overlay.png and p1.jpg are all created by myself(Lini Tan)*/
+  background-position: center top;
+  background-size: cover;
+  line-height: 1.75;
+  text-align: center;
+}
+
+#banner3 {
+  /*padding: 1em 5em 5em 10em;*/
+  /*background-attachment: fixed;*/
+  background-image: url("../images/overlay.png"), url("../images/background3.jpg");
+  /*the overlay.png and p1.jpg are all created by myself(Lini Tan)*/
+  background-position: center top;
+  background-size:contain;
+  line-height: 1.75;
+  text-align: center;
+}
+
+#banner4 {
+  /*padding: 1em 5em 5em 10em;*/
+  /*background-attachment: fixed;*/
+  background-image: url("../images/overlay.png"), url("../images/background5.png");
+  /*the overlay.png and p1.jpg are all created by myself(Lini Tan)*/
+  background-position: center top;
+  background-size:auto;
+  line-height: 1.75;
+  text-align: center;
+}
+p{
+  font-size: 30px;
+  font-family:fantasy;
+  color: white;
+}
+/*h3{
+
+  font-size: 40px;
+  margin-right: 20em;
+  font-family:impact;
+  color: white;
+}*/
+svg {
+  /*border: solid #ccc 1px;*/
+  margin-right: 1em;
+  margin-top: 10em;
+
+}
+
+#sneakySvg {
+  /*margin-left: 3em;
+  margin-bottom: 2em;*/
+  margin-top: 3em;
+}
+/****************************/
+/* media queries            */
+/****************************/
+
+/*ipad*/
+@media screen and (max-width: 768px) {
+    #header nav {
+      font-size: 70%;
+      padding-right: 1em;
+    }
+    #banner {
+      font-size: 70%;
+    }
+    #one{
+      font-size: 80%
+    }
+}
+/*phone*/
+@media screen and (max-width: 480px) {
+  #header nav {
+    font-size: 40%;
+    padding-right: 3em;
+  }
+  #banner {
+    font-size: 60%;
+  }
+  #one{
+    font-size: 70%
+  }
+}

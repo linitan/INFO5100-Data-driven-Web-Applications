@@ -1,0 +1,305 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title> P1_v0 </title>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="http://d3js.org/topojson.v2.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+	<style>
+		body { font-family: 'Alegreya Sans', Calibri, sans-serif;}
+		svg { border: solid #ccc 1px;}
+		div { text-align: center;}
+	</style>
+</head>
+<body>
+	<center><H1>INFO 5100</H1></center>
+
+
+</div>
+
+<p1 id="p1"></p>
+	<script>
+
+    var diameter = 1200,
+    radius = diameter / 2,
+    innerRadius = radius - 100;
+
+
+
+    var svg = d3.select("body").append("svg")
+      .attr("width", diameter)
+      .attr("height", diameter+200)
+      .append("g")
+    //  .attr("transform", "translate(" + radius + "," + radius + ")");
+
+    var alle_icon = ['/arryn.png','/baratheon.png','/greyjoy.png','/lannister.png','/martell.png','/stark.png','/targaryen.png','/tully.png','/tyrell.png'];
+    var alle = ['Arryn','Baratheon','Greyjoy','Lannister','Martell','Stark','Targaryen','Tully','Tyrell'];
+    //alle_icon.push();
+
+    var num = 0;
+    var widthicon = 100;
+    var heighticon = 160;
+    var xicon = 20;
+    var yicon = 1200;
+    var i = 0;
+
+                         d3.select("svg").append("svg:image")
+                   .attr('x', xicon)
+                   .attr('y', yicon)
+                   .attr('width',100)
+                   .attr('height',160)
+                   .attr('id',alle[0])
+                   .attr('xlink:href',alle_icon[0])
+                   .on('mouseover',function(){
+                    updateData(alle[0]);}
+                    );
+                          d3.select("svg").append("svg:image")
+                   .attr('x', xicon+130)
+                   .attr('y', yicon)
+                   .attr('width',100)
+                   .attr('height',160)
+                   .attr('id',alle[1])
+                   .attr('xlink:href',alle_icon[1])
+                   .on('mouseover',function(){
+                    updateData(alle[1]);}
+                    );
+                          d3.select("svg").append("svg:image")
+                   .attr('x', xicon+130*2)
+                   .attr('y', yicon)
+                   .attr('width',100)
+                   .attr('height',160)
+                   .attr('id',alle[2])
+                   .attr('xlink:href',alle_icon[2])
+                   .on('mouseover',function(){
+                    updateData(alle[2]);}
+                    );
+                          d3.select("svg").append("svg:image")
+                   .attr('x', xicon+130*3)
+                   .attr('y', yicon)
+                   .attr('width',100)
+                   .attr('height',160)
+                   .attr('id',alle[3])
+                   .attr('xlink:href',alle_icon[3])
+                   .on('mouseover',function(){
+                    updateData(alle[3]);}
+                    );
+                          d3.select("svg").append("svg:image")
+                   .attr('x', xicon+130*4)
+                   .attr('y', yicon)
+                   .attr('width',100)
+                   .attr('height',160)
+                   .attr('id',alle[4])
+                   .attr('xlink:href',alle_icon[4])
+                   .on('mouseover',function(){
+                    updateData(alle[4]);}
+                    );
+                          d3.select("svg").append("svg:image")
+                   .attr('x', xicon+130*5)
+                   .attr('y', yicon)
+                   .attr('width',100)
+                   .attr('height',160)
+                   .attr('id',alle[5])
+                   .attr('xlink:href',alle_icon[5])
+                   .on('mouseover',function(){
+                    updateData(alle[5]);}
+                    );
+                          d3.select("svg").append("svg:image")
+                   .attr('x', xicon+130*6)
+                   .attr('y', yicon)
+                   .attr('width',100)
+                   .attr('height',160)
+                   .attr('id',alle[6])
+                   .attr('xlink:href',alle_icon[6])
+                   .on('mouseover',function(){
+                    updateData(alle[6]);}
+                    );
+                          d3.select("svg").append("svg:image")
+                   .attr('x', xicon+130*7)
+                   .attr('y', yicon)
+                   .attr('width',100)
+                   .attr('height',160)
+                   .attr('id',alle[7])
+                   .attr('xlink:href',alle_icon[7])
+                   .on('mouseover',function(){
+                    updateData(alle[7]);}
+                    );
+                          d3.select("svg").append("svg:image")
+                   .attr('x', xicon+130*8)
+                   .attr('y', yicon)
+                   .attr('width',100)
+                   .attr('height',160)
+                   .attr('id',alle[8])
+                   .attr('xlink:href',alle_icon[8])
+                   .on('mouseover',function(){
+                    updateData(alle[8]);}
+                    );
+ 
+      
+
+    var circle = d3.select("svg").append("circle")
+        .attr("stroke", "gray")
+        .attr("fill", 'none')
+        .attr('id','thecircle')
+        .style("opacity", 0.6)
+        .style("stroke-width", 5)
+        //.attr("transform", "translate(40, 40)")
+        .attr('cx', 600)
+        .attr('cy', 600)
+        .attr('r', innerRadius);
+
+    var ChaName = d3.select("svg").append("text")
+        .attr("id", "ChaName")
+        .attr("x", 50)
+        .attr("y", 50)
+        .style("font-size", "25pt");
+
+    var ChaDeath = d3.select("svg").append("text")
+        .attr("id", "ChaDeath")
+        .attr("x", 50)
+        .attr("y", 100)
+        .attr("fill", "black")
+        .style("opacity", 0.8)
+        .style("font-size", "15pt");
+
+    var AlleName = d3.select("svg").append("text")
+        .attr("id", "AlleName")
+        .attr("x", 1000)
+        .attr("y", 50)
+        .style('font-family', 'Impact')
+        .style("font-size", "25pt");
+
+
+
+
+
+    var rawTripData;
+
+
+
+    d3.csv("final_death.csv" , function (error, data) {
+      rawDeathData = data;
+      rawDeathData.forEach(function (cha) {
+          var temp = "M"+cha.x1+","+cha.y1+"Q 600, 600,"+cha.x2+","+cha.y2
+          var tempid = "theid"+cha.Id
+          var tempidt = "theidt"+cha.Id
+
+          var temppath = svg.append("path")
+              .attr("d", temp)
+              .attr("id",tempid)  
+              .style("stroke-width", 2)
+              .style("stroke", "blue")
+              .attr('fill','none')
+              .style("opacity", 0.3)
+              .on("mouseover", function () {
+                   ChaName.text(cha.Name);
+                   ChaDeath.text("Intro "+cha.BookIntro + "     Death "+"Book "+cha.BookDeath+" Chapter "+cha.DeathChapter);
+                   temppath.style("stroke", "red")
+                           .style("opacity", 0.8)
+                           .style("stroke-width", 9);
+                  })
+              .on("mouseout", function(){
+                temppath.style("stroke", "blue")
+                        .style("opacity", 0.3)
+                        .style("stroke-width", 2);
+              });
+
+
+          var temprotate = "rotate("+cha.rot+","+cha.x1+","+cha.y1 +")"
+
+          svg.append("text")
+             .attr("x", cha.x1)
+             .attr("y", cha.y1)
+             .text(cha.Name)
+             .attr("id",tempidt)
+             .style("stroke-width", 2)
+             .attr("font-size", 10)
+             .attr("fill", "black")
+             .attr("transform", temprotate)
+             .on("mouseover", function () {
+                   ChaName.text(cha.Name);
+                   ChaDeath.text("Intro "+cha.Intro + " Death "+cha.Death)
+                  });
+
+            })
+    });
+
+
+ function updateData(theallegiance) {
+
+
+      var num = 100;
+
+      while (num>0){
+        var tempde = "#theid"+num;
+        var tempdet = "#theidt"+num;
+        d3.select(tempde).remove();
+        d3.select(tempdet).remove();
+        num = num-1;
+      }
+
+
+    AlleName.text(theallegiance);
+
+    d3.csv("final_death.csv" , function (error, data) {
+      rawDeathData = data;
+      rawDeathData.forEach(function (cha) {
+
+       if (theallegiance == cha.Allegiances){
+
+          var temp = "M"+cha.x1+","+cha.y1+"Q 600, 600,"+cha.x2+","+cha.y2
+          var tempid = "theid"+cha.Id
+          var tempidt = "theidt"+cha.Id
+
+          var temppath = svg.append("path")
+              .attr("d", temp)
+              .attr("id",tempid)  
+              .style("stroke-width", 2)
+              .style("stroke", "blue")
+              .attr('fill','none')
+              .style("opacity", 0.3)
+              .on("mouseover", function () {
+                   ChaName.text(cha.Name);
+                   ChaDeath.text("Intro "+cha.BookIntro + "     Death "+"Book "+cha.BookDeath+" Chapter "+cha.DeathChapter);
+                   temppath.style("stroke", "red")
+                           .style("opacity", 0.8)
+                           .style("stroke-width", 8);
+                  })
+              .on("mouseout", function(){
+                temppath.style("stroke", "blue")
+                        .style("opacity", 0.3)
+                        .style("stroke-width", 2);
+              });
+
+
+          var temprotate = "rotate("+cha.rot+","+cha.x1+","+cha.y1 +")"
+          var temptrans = "translate("+cha.offset+","+cha.offset +")"
+
+          svg.append("text")
+             .attr("x", cha.x1)
+             .attr("y", cha.y1)
+             .text(cha.Name)
+             .attr("id",tempidt)
+             .style("stroke-width", 2)
+             .attr("font-size", 10)
+             .attr("fill", "black")
+             .attr("transform", temprotate+temptrans)
+             .on("mouseover", function () {
+                   ChaName.text(cha.Name);
+                   ChaDeath.text("Intro "+cha.Intro + " Death "+cha.Death)
+                  });
+      }
+
+            })
+    });          
+        
+
+}
+
+
+	</script>
+
+
+
+</body>
+</html>
