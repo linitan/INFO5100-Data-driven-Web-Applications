@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>map</title>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/default.min.css">
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="http://d3js.org/topojson.v2.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://d3js.org/d3-geo-projection.v1.min.js"></script>
+    <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
+    <script src="https://d3js.org/d3-selection.v1.min.js"></script>
+    <script src="https://d3js.org/d3-drag.v1.min.js"></script>
+    <script src="functions.js"></script>
+
+    <style>
+      h2, h3{
+        text-align: center;
+      }
+      .p{
+        color: #6784ba;
+      }
+      #map{
+        margin-top: 3em;
+        margin-left: 4em;
+      }
+      #icon{
+        margin-left: 4em;
+        margin-top: 1em;
+      }
+      body { font-family: 'Alegreya Sans', Calibri, sans-serif;
+      background-image:url(images/backgroundcolor.png);
+      background-position: center top;
+      background-size:cover;
+      background-color: #464445;
+     }
+      svg {
+        border: solid #ccc 1px;
+      display: block;
+      /*margin: AUSo;*/
+}
+
+#slider3{
+  margin-top: 1em;
+  margin-left: 2em;
+}
+      </style>
+  </head>
+
+	<body>
+    <div id=map>
+    </div>
+    <div id="slider3"></div>
+    <div id="icon"></div>
+      <script>
+
+      // //slider
+      var init_year = 1940;
+      d3.select("#slider3").append("input")
+          .attr("type", "range")
+          .attr("min", "1940")
+          .attr("max", "2014")
+          .attr("value", init_year)
+          .attr("id", "year")
+          .attr("style","width:1100px");
+
+      var timlineData;
+      var counties;
+      var stateGun;
+      var stateGun2;
+      var color = "#FAA107";
+      var color_na = "white";
+      var svg = d3.select("#map")
+      .append("svg")
+      .attr("width", 1040)
+      .attr("height", 400);
+      //icon
+      var svg2 = d3.select("#icon")
+      .append("svg")
+      .attr("width", 1140)
+      .attr("height", 150);
+      var icon = ["USA","RUS","DEU","JPN","FRA","MEX","ESP","GBR","MYS","AUT"];
+      var widthicon = 110;
+      var heighticon = 110;
+      var xicon = 0;
+      var yicon = 0;
+      icon.forEach(function (icon) {
+        svg2.append("svg:image")
+       .attr('width',widthicon)
+       .attr('height',heighticon)
+       .attr('id',icon)
+       .attr('xlink:href', "images/" + icon+".png")
+       .attr("opacity", 0.1);;
+      });
+
+      svg2.select("#RUS").attr("x",xicon+widthicon).attr("y",yicon);
+      svg2.select("#DEU").attr("x",xicon+2*widthicon).attr("y",yicon);
+      svg2.select("#JPN").attr("x",xicon+3*widthicon).attr("y",yicon);
+      svg2.select("#FRA").attr("x",xicon+4*widthicon).attr("y",yicon);
+      svg2.select("#MEX").attr("x",xicon+5*widthicon).attr("y",yicon);
+      svg2.select("#ESP").attr("x",xicon+6*widthicon).attr("y",yicon);
+      svg2.select("#GBR").attr("x",xicon+7*widthicon).attr("y",yicon);
+      svg2.select("#MYS").attr("x",xicon+8*widthicon).attr("y",yicon);
+      svg2.select("#AUT").attr("x",xicon+9*widthicon).attr("y",yicon);
+
+      //noteboard
+      var noteboardX = 690;
+      var noteboardY = 130;
+      svg.append("rect")
+      .attr("width",230)
+      .attr("height",230)
+      .attr("x",noteboardX)
+      .attr("y",noteboardY)
+      .attr("id","textholder")
+       .style("fill","#181818");
+
+
+      svg.append("line")
+      .style("stroke", "#FAA107")
+      .style("stroke-width", 3)  // colour the line
+    .attr("x1", noteboardX+15)     // x position of the first end of the line
+    .attr("y1", noteboardY+40)      // y position of the first end of the line
+    .attr("x2", noteboardX+215)     // x position of the second end of the line
+    .attr("y2", noteboardY+40);
+
+    // svg.append("text")
+    // .text("hahahahahahahahahahah")
+    // .attr("x", 670)     // x position of the first end of the line
+    // .attr("y", 140)
+    // .style("fill","white");
+    //
+    // svg.append("text")
+    // .text("hahahahahahahahahahah")
+    // .attr("x", 670)     // x position of the first end of the line
+    // .attr("y", 160)
+    // .style("fill","white");
+    //
+    // svg.append("text")
+    // .text("hahahahahahahahahahah")
+    // .attr("x", 670)     // x position of the first end of the line
+    // .attr("y", 180)
+    // .style("fill","white");
+    //
+    // svg.append("text")
+    // .text("hahahahahahahahahahah")
+    // .attr("x", 670)     // x position of the first end of the line
+    // .attr("y", 200)
+    // .style("fill","white");
+
+
+  //   <foreignObject width="200" height="200"
+  //   requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+  //    <p xmlns="http://www.w3.org/1999/xhtml"></p>
+  //  </foreignObject>
+
+
+    svg.append("line")
+    .style("stroke", "#FAA107")
+    .style("stroke-width", 3)  // colour the line
+    .attr("x1", noteboardX+15)     // x position of the first end of the line
+    .attr("y1", noteboardY+190)      // y position of the first end of the line
+    .attr("x2", noteboardX+215)     // x position of the second end of the line
+    .attr("y2", noteboardY+190);
+
+
+       //read data
+      var parseRow = function(row) {
+      	row.id = row.id;
+      	return row;
+      }
+
+
+      d3.queue()
+      .defer(d3.json, "worldmap.json")
+      .defer(d3.csv, "pandaTimeline3.csv", parseRow)
+      .defer(d3.csv, "pandaTimeline2.csv", parseRow)
+      .await(function (error, rawMap, rawGun,rawGun2) {
+        console.log("Code in the call-back function is only executed when every data file loads.");
+        stateGun = d3.map(rawGun, function (d) {
+      		return d.id;
+      	});
+        stateGun2 = d3.map(rawGun2, function (d) {
+      		return d.id;
+      	});
+        var projection = d3.geoMercator().scale(100).translate([300,225]);
+              var path = d3.geoPath().projection(projection);
+
+              d3.json("worldmap.json",function(error,data){
+                if(error)
+                  return console.error(error);
+                console.log(data.features);
+                svg.selectAll("path")
+                .data(data.features)
+                .enter()
+                .append("path")
+                .attr("stroke","white")
+                .attr("fill","white")
+                .attr("d",path)
+                .on("click", function (d) { console.log(d.id); })
+                .attr("id", function(d) { return d.id; })
+                // .call(fillMap, color, data);
+              });
+
+                // was the slider used?
+      d3.select("#year").on("input", function() {
+          updateMap(color, stateGun["$"+this.value])
+          updateIcon(1,stateGun2["$"+this.value]);
+      });
+
+
+
+      });
+
+
+
+
+    </script>
+  </body>
+</html>
